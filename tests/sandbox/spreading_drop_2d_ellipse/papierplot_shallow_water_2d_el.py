@@ -9,6 +9,7 @@ import numpy as np
 import h5py
 import plot_settings as ps
 import analytic_el_eq as eq_el
+import pdb
 
 # plotting analytic solutions for height and velocity 
 def analytic_fig(ax, time_l = [0.,3., 7.], x_range = np.linspace(-8,8,320),
@@ -46,6 +47,7 @@ def reading_modeloutput(filename):
 #plotting together analytic solution and model output 
 def analytic_model_fig(ax, x_range, y_range, h_m, v_m, time=1):
     print "time analytic_model", time
+    pdb.set_trace()
     lamb_ar = eq_el.d2_el_lamb_lamb_t_evol(time, lamb_x0=3., lamb_y0=1.)#TODO
     h_x = eq_el.d2_el_height(lamb_ar[2], lamb_ar[0], x_range, y_range) #TODO: zmienia sie
     h_x0 = eq_el.d2_el_height(1., 3., x_range, y_range) # TODO: zmienia sie
@@ -54,10 +56,9 @@ def analytic_model_fig(ax, x_range, y_range, h_m, v_m, time=1):
     h_y0 = eq_el.d2_el_height(3., 1., y_range, x_range)
     v_x = eq_el.d2_el_velocity(lamb_ar[0], lamb_ar[1], lamb_ar[2], x_range, y_range)
     v_y = eq_el.d2_el_velocity(lamb_ar[2], lamb_ar[3], lamb_ar[0], x_range, y_range)
-
     ax.plot(x_range, h_x0, 'k', x_range, h_x, 'b',
-            x_range, h_m, "r")
-    ax.plot(x_range, 0*x_range, "k--", x_range, v_y, 'b--', #TODO: zmienia sie
+            x_range, h_m, "r") #tu trzeba zmienic na h_y0 i h_y
+    ax.plot(x_range, 0*x_range, "k--", x_range, v_y, 'b--', #TODO: tu trzeba na v_x
             x_range, v_m, "r--")
 
     ax.set_ylim(-1., 1.)
@@ -68,7 +69,7 @@ def analytic_model_fig(ax, x_range, y_range, h_m, v_m, time=1):
 # time - model time level used for comparison with analytic solution
 # dt -  model time step
 # x_shift - shift between initial cond. in model and for analytic solution
-def main(dir, casename_l, x_shift=8, time_l=[0,3], time=1, dt=0.01):
+def main(dir, casename_l, time=1, dt=0.01, nxy=320, xy_lim=8):
     plt.figure(1, figsize = (6,8))
     ax = plt.subplot(len(casename_l)+1,1,1)
     #plotting analytic solution
@@ -77,35 +78,35 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], time=1, dt=0.01):
     for ic, casename in enumerate(casename_l):
         print "plotting for " + casename + ", t = " + str(time)
         #model variables TODO: time
-        print "filename", (dir+"spreading_drop_2delipsa_" + casename +
-                                              ".out/timestep0000000" + str(int(time/dt))
-                                              + '.h5')
-        
-        h_m, px_m, py_m = reading_modeloutput(dir+"spreading_drop_2delipsa_" + casename +
-                                              ".out/timestep0000000" + str(int(time/dt))
-                                              + '.h5')
+        h_m, px_m, py_m = reading_modeloutput(dir+"spreading_drop_2delipsa3do1_" + casename + ".out/timestep0000000" + str(int(time/dt)) + '.h5')
+        pdb.set_trace()
         # calculate velocity (momentum/height) only in the droplet region.
         #calculating velocity from momentum, only for the droplet area 
-        v_m = np.where(h_m > 0.,  py_m/h_m, 0)
+        vy_m = np.where(h_m > 1.e-8,  py_m/h_m, 0)
+        vx_m = np.where(h_m > 1.e-8,  px_m/h_m, 0)
         print "where with h_m = 0 !!"
-        import pdb
-        pdb.set_trace()
         ax = plt.subplot(len(casename_l)+1,1,ic+2)
         
         # choosing a plane of a cross section TODO: should be 160?
         # TODO: x_range/y_range should be calculated from hdf file!!
         print "TODO: x_range/y_range should be calculated from hdf file!!"
+        #analytic_model_fig(ax,
+        #                   np.linspace(-xy_lim, xy_lim, nxy), np.zeros(nxy),
+        #                   h_m[nxy/2,:], vy_m[nxy/2,:], time)
+
+        #cos nie dzialaPEWNIE ANALITYCZNE ZLE LICZONE - W INNEJ PLASZCZYZNIE (powyzej wytlumaczone)                   
         analytic_model_fig(ax,
-                           np.linspace(-8,8,h_m.shape[0]), np.zeros(h_m[0].shape[0]),
-                           h_m[159,:], v_m[159,:], time)
+                           np.linspace(-xy_lim, xy_lim, nxy),np.zeros(nxy),
+                           h_m[:,nxy/2], vx_m[:, nxy/2], time)
+
         
         ax.annotate(str(casename), xy=(0.01, 0.97), xycoords='axes fraction',
                     fontsize=12, horizontalalignment='left', verticalalignment='top')
         
-    plt.savefig("papier_shallowwater_2delipsa_x=0_it=1.pdf")
+    plt.savefig("testypapier_shallowwater_2delipsa.pdf")
     plt.show()
 
-main("./", sys.argv[1:])
+main("./", sys.argv[1:], time=3, nxy=640, xy_lim=16)
 
     
     
