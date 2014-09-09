@@ -16,8 +16,8 @@ using boost::math::constants::pi;
 #include <fstream>
 
 const int 
-  nt = 300,
-  outfreq = 100;
+  nt = 2800,
+  outfreq = 400;
 
 using real_t = double;
 
@@ -26,8 +26,8 @@ struct intcond
   real_t operator()(const real_t &x, const real_t &y) const
   {
     return 
-      x*x/9. + y*y <= 1 // if
-      ? 1./3. * (1 - x*x/9. - y*y)  // then
+      x*x/4. + y*y <= 1 // if
+      ? 1./2. * (1 - x*x/4. - y*y)  // then
       : 0;             // else
   }
   BZ_DECLARE_FUNCTOR2(intcond);
@@ -46,7 +46,7 @@ void test(const std::string &outdir)
     enum { n_eqns = 3 };
     
     // options
-    enum { opts = opts_arg };
+    enum { opts = opts_arg | opts::dfl };
     enum { rhs_scheme = solvers::trapez };
 
     //enum { fp_round_mode = FE_TOWARDZERO };
@@ -73,10 +73,10 @@ void test(const std::string &outdir)
   // run-time parameters
   typename solver_t::rt_params_t p; 
 
-  p.dt = .01;
-  p.di = .05;
-  p.dj = .05;
-  p.grid_size = { int(32 / p.di), int(32 / p.dj) };
+  p.dt = .0025;
+  p.di = .0125;
+  p.dj = .0125;
+  p.grid_size = { int(20 / p.di), int(20 / p.dj) };
   p.g = 1;
   p.outfreq = outfreq;
   p.outdir = outdir;
@@ -111,8 +111,8 @@ void test(const std::string &outdir)
 
 int main()
 {
-  test<opts::fct | opts::iga>("spreading_drop_2delipsa_fct+iga.out");
-  test<opts::fct | opts::abs>("spreading_drop_2delipsa_fct+abs.out");
-  system("python ../../../../tests/sandbox/spreading_drop_2d_ellipse/papierplot_shallow_water_2d_el.py fct+abs fct+iga");
+  test<opts::fct | opts::iga>("spreading_drop_2delipsa_dx.0125_dt.0025_fct+iga.out");
+  //test<opts::fct | opts::abs>("spreading_drop_2delipsa_fct+abs.out");
+  //system("python ../../../../tests/sandbox/spreading_drop_2d_ellipse/papierplot_shallow_water_2d_el.py fct+abs fct+iga");
 }
 
