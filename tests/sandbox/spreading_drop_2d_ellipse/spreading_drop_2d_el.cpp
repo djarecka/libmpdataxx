@@ -16,8 +16,8 @@ using boost::math::constants::pi;
 #include <fstream>
 
 const int 
-  nt = 2800,
-  outfreq = 400;
+  nt = 700,
+  outfreq = 100;
 
 using real_t = double;
 
@@ -73,9 +73,9 @@ void test(const std::string &outdir)
   // run-time parameters
   typename solver_t::rt_params_t p; 
 
-  p.dt = .0025;
-  p.di = .0125;
-  p.dj = .0125;
+  p.dt = .01;
+  p.di = .05;
+  p.dj = .05;
   p.grid_size = { int(20 / p.di), int(20 / p.dj) };
   p.g = 1;
   p.outfreq = outfreq;
@@ -111,7 +111,7 @@ void test(const std::string &outdir)
 
 int main()
 {
-  test<opts::fct | opts::iga>("spreading_drop_2delipsa_dx.0125_dt.0025_fct+iga.out");
+  test<opts::fct | opts::iga>("spreading_drop_2delipsa_fct+iga.out");
   //test<opts::fct | opts::abs>("spreading_drop_2delipsa_fct+abs.out");
   //system("python ../../../../tests/sandbox/spreading_drop_2d_ellipse/papierplot_shallow_water_2d_el.py fct+abs fct+iga");
 }
