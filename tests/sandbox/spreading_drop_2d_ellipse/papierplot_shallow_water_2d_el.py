@@ -20,9 +20,9 @@ def analytic_fig(ax, time_l = [0.,3., 7.], x_range = np.linspace(-8,8,320),
     for it, time in enumerate(time_l):
         print "time w fig", time
         if time == 0.:
-            lamb_ar = [3., 0., 1., 0.]
+            lamb_ar = [2., 0., 1., 0.]
         else:
-            lamb_ar = eq_el.d2_el_lamb_lamb_t_evol(time, lamb_x0=3., lamb_y0=1.)#TODO
+            lamb_ar = eq_el.d2_el_lamb_lamb_t_evol(time, lamb_x0=2., lamb_y0=1.)#TODO
         h_x = eq_el.d2_el_height(lamb_ar[0], lamb_ar[2], x_range, y_range)
         #TODO zrobic to lepiej, zeby sie nie mylilo x z y
         h_y = eq_el.d2_el_height(lamb_ar[0], lamb_ar[2], y_range, x_range)
@@ -48,17 +48,17 @@ def reading_modeloutput(filename):
 def analytic_model_fig(ax, x_range, y_range, h_m, v_m, time=1):
     print "time analytic_model", time
     pdb.set_trace()
-    lamb_ar = eq_el.d2_el_lamb_lamb_t_evol(time, lamb_x0=3., lamb_y0=1.)#TODO
+    lamb_ar = eq_el.d2_el_lamb_lamb_t_evol(time, lamb_x0=2., lamb_y0=1.)#TODO
     h_x = eq_el.d2_el_height(lamb_ar[2], lamb_ar[0], x_range, y_range) #TODO: zmienia sie
-    h_x0 = eq_el.d2_el_height(1., 3., x_range, y_range) # TODO: zmienia sie
+    h_x0 = eq_el.d2_el_height(1., 2., x_range, y_range) # TODO: zmienia sie
     #TODO zrobic to lepiej, zeby sie nie mylilo x z y
     h_y = eq_el.d2_el_height(lamb_ar[0], lamb_ar[2], y_range, x_range)
-    h_y0 = eq_el.d2_el_height(3., 1., y_range, x_range)
+    h_y0 = eq_el.d2_el_height(2., 1., y_range, x_range)
     v_x = eq_el.d2_el_velocity(lamb_ar[0], lamb_ar[1], lamb_ar[2], x_range, y_range)
     v_y = eq_el.d2_el_velocity(lamb_ar[2], lamb_ar[3], lamb_ar[0], x_range, y_range)
     ax.plot(x_range, h_x0, 'k', x_range, h_x, 'b',
             x_range, h_m, "r") #tu trzeba zmienic na h_y0 i h_y
-    ax.plot(x_range, 0*x_range, "k--", x_range, v_y, 'b--', #TODO: tu trzeba na v_x
+    ax.plot(x_range, 0*x_range, "k--", x_range, v_x, 'b--', #TODO: tu trzeba na v_x
             x_range, v_m, "r--")
 
     ax.set_ylim(-1., 1.)
@@ -69,7 +69,7 @@ def analytic_model_fig(ax, x_range, y_range, h_m, v_m, time=1):
 # time - model time level used for comparison with analytic solution
 # dt -  model time step
 # x_shift - shift between initial cond. in model and for analytic solution
-def main(dir, casename_l, time=1, dt=0.01, nxy=320, xy_lim=8):
+def main(dir, casename_l, time=1, dt=0.01, nxy=400, xy_lim=10):
     plt.figure(1, figsize = (6,8))
     ax = plt.subplot(len(casename_l)+1,1,1)
     #plotting analytic solution
@@ -78,12 +78,12 @@ def main(dir, casename_l, time=1, dt=0.01, nxy=320, xy_lim=8):
     for ic, casename in enumerate(casename_l):
         print "plotting for " + casename + ", t = " + str(time)
         #model variables TODO: time
-        h_m, px_m, py_m = reading_modeloutput(dir+"spreading_drop_2delipsa3do1_" + casename + ".out/timestep0000000" + str(int(time/dt)) + '.h5')
+        h_m, px_m, py_m = reading_modeloutput(dir+"spreading_drop_2delipsa_" + casename + ".out/timestep0000000" + str(int(time/dt)) + '.h5')
         pdb.set_trace()
         # calculate velocity (momentum/height) only in the droplet region.
         #calculating velocity from momentum, only for the droplet area 
-        vy_m = np.where(h_m > 1.e-8,  py_m/h_m, 0)
-        vx_m = np.where(h_m > 1.e-8,  px_m/h_m, 0)
+        vy_m = np.where(h_m > 1.e-7,  py_m/h_m, 0)
+        vx_m = np.where(h_m > 1.e-7,  px_m/h_m, 0)
         print "where with h_m = 0 !!"
         ax = plt.subplot(len(casename_l)+1,1,ic+2)
         
@@ -106,7 +106,7 @@ def main(dir, casename_l, time=1, dt=0.01, nxy=320, xy_lim=8):
     plt.savefig("testypapier_shallowwater_2delipsa.pdf")
     plt.show()
 
-main("./", sys.argv[1:], time=3, nxy=640, xy_lim=16)
+main("./", sys.argv[1:], time=3, nxy=400, xy_lim=10)
 
     
     
