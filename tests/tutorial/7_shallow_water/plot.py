@@ -52,10 +52,10 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], it=300):
     print "plotting analytic solution"
     analytic_fig(ax, time_l)
     plt.savefig("papier_shallowwater_1d_analytic.pdf")
-    plt.show()
+    #plt.show()
     #plotting comparison between analytic solution and model results for various options
     for ic, casename in enumerate(casename_l): 
-        plt.figure(1, figsize = (6,3))
+        plt.figure(ic+1, figsize = (6,3))
         ax = plt.subplot(1,1,1)
         h_m = reading_modeloutput(dir+casename+".h")
         p_m = reading_modeloutput(dir+casename+".q")
@@ -74,7 +74,7 @@ def main(dir, casename_l, x_shift=8, time_l=[0,3], it=300):
         
 
         plt.savefig("papier_shallowwater_1d_"+str(casename)+".pdf")
-        plt.show()
+        #plt.show()
 
 
 main("./", sys.argv[1:])
